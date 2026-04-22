@@ -3,11 +3,6 @@
 SELECT * FROM "table-name";
 
 CREATE TABLE countries (
-    id INTEGER PRIMARY KEY,
-    iso3 TEXT NOT NULL,
-    name TEXT NOT NULL,
-    capital TEXT NOT NULL,
-    population INTEGER NOT NULL,
-    region TEXT NOT NULL,
+    iso2 TEXT PRIMARY KEY,   -- e.g. 'US', 'GB', 'JP'
     description TEXT NOT NULL
-)
+);
