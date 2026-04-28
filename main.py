@@ -17,8 +17,6 @@ def get_db():
 def home():
     return render_template("home.html")
 
-
-# --- This is the new route your globe will call ---
 # When a user clicks a country, the frontend sends the iso2 code (e.g. "US", "JP")
 # and this returns the custom description from your database as JSON.
 @app.route("/api/country/<iso2>")
@@ -37,4 +35,4 @@ def get_country(iso2):
 
 
 if __name__ == "__main__":
-    app.run(debug=True)
+    app.run(debug=True, port=5245)
