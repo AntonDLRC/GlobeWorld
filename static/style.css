@@ -1,3 +1,5 @@
+
+/* Background image for the entire page */
 body {
     background-image: url('../static/stars%20background.avif');
     background-size: cover;
@@ -5,3 +7,7 @@ body {
     background-repeat: no-repeat;
     background-attachment: fixed;
 }
+
+/* Header styling */
+.header {
+    
