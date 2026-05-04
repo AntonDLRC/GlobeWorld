@@ -1,10 +1,20 @@
 {% extends "layout.html" %}
 
 {% block body %}
+<!-- title content -->
     <header class="header">
         <h1 class="title">GlobeWorld</h1>
         <p class="subtitle">Click any country | <br>
             Drag to rotate
         </p>
     </header>
+
+<!-- globe container (rest of code is in javascript) -->
+    <div id="globe-container"></div>
+
+<!-- loaded from the internet -->
+<script src="https://unpkg.com/globe.gl"></script>
+<script src="{{ url_for('static', filename='home.js') }}"></script>
+<script src="https://cdn.jsdelivr.net/npm/topojson-client@3"></script>
+
 {% endblock %}
