@@ -58,3 +58,13 @@ function capAlt(d) {
   return 0.006;
 }
 
+// Used to show the country name when hovering
+const nameMap = new Map();
+fetch('https://restcountries.com/v3.1/all?fields=name,ccn3')
+  .then(r => r.json())
+  .then(list => {
+    list.forEach(c => {
+      if (c.ccn3) nameMap.set(c.ccn3, c.name.common);
+    });
+  });
+
