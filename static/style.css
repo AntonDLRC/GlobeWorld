@@ -12,3 +12,10 @@ body {
 .header {
     color: white;
 }
+
+/* Globe container styling */
+#globe-container {
+  position: fixed;
+  inset: 0;
+  z-index: 1;
+}
