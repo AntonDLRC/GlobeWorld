@@ -11,6 +11,10 @@ body {
 /* Header styling */
 .header {
     color: white;
+    left: 4rem;
+    top: 1rem;
+    position: absolute;
+
 }
 
 /* Globe container styling */
