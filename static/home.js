@@ -68,3 +68,10 @@ fetch('https://restcountries.com/v3.1/all?fields=name,ccn3')
     });
   });
 
+/* Globe Auto Spinning */
+
+const controls = globe.controls();
+controls.autoRotate      = true;
+controls.autoRotateSpeed = 0.38;
+controls.enableDamping   = true;
+controls.dampingFactor   = 0.07;
