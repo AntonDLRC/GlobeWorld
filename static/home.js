@@ -75,3 +75,12 @@ controls.autoRotate      = true;
 controls.autoRotateSpeed = 0.38;
 controls.enableDamping   = true;
 controls.dampingFactor   = 0.07;
+
+// Pause auto-rotation on mouse hover, resume on mouse out
+let spinTimer     = null;
+const globeCanvas = globe.renderer().domElement;
+
+// Stop spinning when user grabs the globe
+globeCanvas.addEventListener('mousedown',  () => { clearTimeout(spinTimer); controls.autoRotate = false; });
+globeCanvas.addEventListener('touchstart', () => { clearTimeout(spinTimer); controls.autoRotate = false; }, { passive: true });
+
