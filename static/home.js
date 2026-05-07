@@ -84,3 +84,6 @@ const globeCanvas = globe.renderer().domElement;
 globeCanvas.addEventListener('mousedown',  () => { clearTimeout(spinTimer); controls.autoRotate = false; });
 globeCanvas.addEventListener('touchstart', () => { clearTimeout(spinTimer); controls.autoRotate = false; }, { passive: true });
 
+// Resume spinning 3 seconds after user lets go
+globeCanvas.addEventListener('mouseup',    () => { spinTimer = setTimeout(() => { controls.autoRotate = true; }, 3000); });
+globeCanvas.addEventListener('touchend',   () => { spinTimer = setTimeout(() => { controls.autoRotate = true; }, 3000); }, { passive: true });
