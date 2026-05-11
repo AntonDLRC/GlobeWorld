@@ -107,6 +107,10 @@ async function onCountryClick(d) {
     if (!c) throw new Error('Country not found');
 
     const iso2 = c.cca2;
+    
+    // Fly the globe to this country
+    const latlng = c.latlng || [0, 0];
+    globe.pointOfView({ lat: latlng[0], lng: latlng[1], altitude: 2.0 }, 1200);
 
     // Step 3 — fetch history description from your Flask database
     let description = 'No historical description available.';
