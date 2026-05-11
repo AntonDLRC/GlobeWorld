@@ -117,5 +117,25 @@ async function onCountryClick(d) {
         description  = dbData.description || description;
       }
     } catch (_) { /* keep fallback description */ }
+    // Step 4 — fill and show the popup
+    renderPopup({
+      name:       c.name.common,
+      official:   c.name.official,
+      flag:       c.flags?.svg || c.flags?.png || '',
+      flagAlt:    c.flags?.alt || `Flag of ${c.name.common}`,
+      capital:    c.capital?.[0]              ?? 'N/A',
+      population: c.population?.toLocaleString() ?? 'N/A',
+      region:     c.subregion  ?? c.region    ?? 'N/A',
+      area:       c.area ? c.area.toLocaleString() + ' km²' : 'N/A',
+      currency:   getCurrency(c.currencies),
+      languages:  getLanguages(c.languages),
+      calling:    getCallingCode(c.idd),
+      timezone:   c.timezones?.[0]            ?? 'N/A',
+      un:         c.unMember ? '✓ Member' : 'Non-member',
+      description,
+    });
 
-  
+  } catch (err) {
+    showError(err.message);
+  }
+}
