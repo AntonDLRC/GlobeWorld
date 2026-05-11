@@ -107,3 +107,15 @@ async function onCountryClick(d) {
     if (!c) throw new Error('Country not found');
 
     const iso2 = c.cca2;
+
+    // Step 3 — fetch history description from your Flask database
+    let description = 'No historical description available.';
+    try {
+      const dbRes = await fetch(`/api/country/${iso2}`);
+      if (dbRes.ok) {
+        const dbData = await dbRes.json();
+        description  = dbData.description || description;
+      }
+    } catch (_) { /* keep fallback description */ }
+
+  
