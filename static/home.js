@@ -87,3 +87,23 @@ globeCanvas.addEventListener('touchstart', () => { clearTimeout(spinTimer); cont
 // Resume spinning 3 seconds after user lets go
 globeCanvas.addEventListener('mouseup',    () => { spinTimer = setTimeout(() => { controls.autoRotate = true; }, 3000); });
 globeCanvas.addEventListener('touchend',   () => { spinTimer = setTimeout(() => { controls.autoRotate = true; }, 3000); }, { passive: true });
+
+/* Country Click Handler */
+// This function is called when a country is clicked. It fetches data from the REST Countries API and your Flask backend, then shows a popup with the information.
+async function onCountryClick(d) {
+  if (!d) return;
+
+  selected = d;
+  globe.polygonCapColor(capColor).polygonAltitude(capAlt);
+  showLoading();
+
+  try {
+    // Step 1 & 2 — get country data using numeric id
+    const apiRes = await fetch(`https://restcountries.com/v3.1/alpha?codes=${d.id}`);
+    if (!apiRes.ok) throw new Error(`restcountries error ${apiRes.status}`);
+
+    const data = await apiRes.json();
+    const c    = data[0];
+    if (!c) throw new Error('Country not found');
+
+    const iso2 = c.cca2;
