@@ -19,7 +19,36 @@
     <button id="popup-close" aria-label="Close">&times;</button>
 
 
+    <!-- LOADING STATE: spinner shown while fetching -->
+    <div id="popup-loading" class="popup-loading">
+        <div class="spinner"></div>
+        <span>Loading…</span>
+    </div>
+
+
+    <!-- ERROR STATE: shown if data could not be loaded -->
+    <div id="popup-error" class="popup-loading">
+        <span style="color: #f87171;">⚠ Could not load data</span>
+        <small id="popup-error-msg"
+               style="color: rgba(248,113,113,0.6); margin-top: 6px; display: block;">
+        </small>
+    </div>
+
+
+    <!-- CONTENT STATE: the actual country information -->
+    <div id="popup-content" class="popup-content">
+
+        <!-- Country flag and name (filled by home.js) -->
+        <div class="popup-header">
+            <img id="popup-flag" src="" alt="" />
+            <div class="popup-title-group">
+                <h2 id="popup-name"></h2>
+                <p  id="popup-official" class="popup-official"></p>
+                <span id="popup-region-badge" class="region-badge"></span>
+            </div>
+        </div>
 </div>
+
 <!-- loaded from the internet -->
 <script src="https://unpkg.com/globe.gl"></script>
 <script src="{{ url_for('static', filename='home.js') }}"></script>
