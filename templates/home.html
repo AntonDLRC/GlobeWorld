@@ -12,6 +12,14 @@
 <!-- globe container (rest of code is in javascript) -->
     <div id="globe-container"></div>
 
+<!-- Popup container-->
+ <div id="popup" class="popup">
+
+    <!-- × close button (&times; = the × symbol in HTML) -->
+    <button id="popup-close" aria-label="Close">&times;</button>
+
+
+</div>
 <!-- loaded from the internet -->
 <script src="https://unpkg.com/globe.gl"></script>
 <script src="{{ url_for('static', filename='home.js') }}"></script>
