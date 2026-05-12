@@ -143,3 +143,11 @@ async function onCountryClick(d) {
     showError(err.message);
   }
 }
+
+/* popup functions*/
+function showLoading() {
+  document.getElementById('popup').classList.add('visible');
+  document.getElementById('popup-loading').classList.add('active');
+  document.getElementById('popup-content').classList.remove('active');
+  document.getElementById('popup-error').classList.remove('active');
+}
