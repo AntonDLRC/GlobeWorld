@@ -203,3 +203,9 @@ function getLanguages(languages) {
   const list = Object.values(languages);
   return list.length > 3 ? list.slice(0, 3).join(', ') + '…' : list.join(', ');
 }
+
+// Get the calling code e.g. "+1", "+44"
+function getCallingCode(idd) {
+  if (!idd || !idd.root) return 'N/A';
+  return idd.root + (idd.suffixes?.[0] || '');
+}
