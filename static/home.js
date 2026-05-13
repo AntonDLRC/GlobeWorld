@@ -188,3 +188,11 @@ document.getElementById('popup-close').addEventListener('click', () => {
   selected = null;
   globe.polygonCapColor(capColor).polygonAltitude(capAlt);
 });
+
+/* helper functions to format country data */
+// Get the currency name and symbol e.g. "US Dollar ($)"
+function getCurrency(currencies) {
+  if (!currencies) return 'N/A';
+  const first = Object.values(currencies)[0];
+  return first ? `${first.name}${first.symbol ? ' (' + first.symbol + ')' : ''}` : 'N/A';
+}
