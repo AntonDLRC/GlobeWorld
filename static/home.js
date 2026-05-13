@@ -196,3 +196,10 @@ function getCurrency(currencies) {
   const first = Object.values(currencies)[0];
   return first ? `${first.name}${first.symbol ? ' (' + first.symbol + ')' : ''}` : 'N/A';
 }
+
+// Get up to 3 languages as a comma list e.g. "English, French…"
+function getLanguages(languages) {
+  if (!languages) return 'N/A';
+  const list = Object.values(languages);
+  return list.length > 3 ? list.slice(0, 3).join(', ') + '…' : list.join(', ');
+}
