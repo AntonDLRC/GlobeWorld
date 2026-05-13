@@ -181,3 +181,10 @@ function renderPopup(info) {
   document.getElementById('popup-error').classList.remove('active');
   document.getElementById('popup-content').classList.add('active');
 }
+
+// Close button — hides the popup and deselects the country
+document.getElementById('popup-close').addEventListener('click', () => {
+  document.getElementById('popup').classList.remove('visible');
+  selected = null;
+  globe.polygonCapColor(capColor).polygonAltitude(capAlt);
+});
