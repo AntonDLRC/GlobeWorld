@@ -151,3 +151,10 @@ function showLoading() {
   document.getElementById('popup-content').classList.remove('active');
   document.getElementById('popup-error').classList.remove('active');
 }
+
+/* error message if something fails */
+function showError(msg) {
+  document.getElementById('popup-loading').classList.remove('active');
+  document.getElementById('popup-error').classList.add('active');
+  document.getElementById('popup-error-msg').textContent = msg;
+}
