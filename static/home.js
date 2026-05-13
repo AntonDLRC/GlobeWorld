@@ -158,3 +158,26 @@ function showError(msg) {
   document.getElementById('popup-error').classList.add('active');
   document.getElementById('popup-error-msg').textContent = msg;
 }
+
+function renderPopup(info) {
+  // Fill every field in the popup with country data
+  document.getElementById('popup-flag').src             = info.flag;
+  document.getElementById('popup-flag').alt             = info.flagAlt;
+  document.getElementById('popup-name').textContent     = info.name;
+  document.getElementById('popup-official').textContent = info.official !== info.name ? info.official : '';
+  document.getElementById('popup-region-badge').textContent = info.region;
+  document.getElementById('popup-capital').textContent    = info.capital;
+  document.getElementById('popup-population').textContent = info.population;
+  document.getElementById('popup-area').textContent       = info.area;
+  document.getElementById('popup-currency').textContent   = info.currency;
+  document.getElementById('popup-languages').textContent  = info.languages;
+  document.getElementById('popup-calling').textContent    = info.calling;
+  document.getElementById('popup-timezone').textContent   = info.timezone;
+  document.getElementById('popup-un').textContent         = info.un;
+  document.getElementById('popup-desc-text').textContent  = info.description;
+
+  // Switch from loading state to content state
+  document.getElementById('popup-loading').classList.remove('active');
+  document.getElementById('popup-error').classList.remove('active');
+  document.getElementById('popup-content').classList.add('active');
+}
