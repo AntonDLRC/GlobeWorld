@@ -67,3 +67,24 @@ body {
   z-index: 2;
   
 }
+
+/* Popup styling */
+.popup-content {
+  display: none;
+  padding: 0 1.25rem 1.5rem;
+}
+
+/* Show content when active */
+.popup-content.active {
+  display: block;
+}
+
+/* Flag + name row */
+.popup-header {
+  display: flex;
+  align-items: center;
+  gap: 0.9rem;
+  margin-bottom: 1.2rem;
+  clear: both; /* clear the close button float */
+  padding-top: 0.25rem;
+}
