@@ -106,3 +106,18 @@ body {
   color: #ffffff;
   line-height: 1.25;
 }
+
+/* Region badge styling */
+.region-badge {
+  display: inline-block;
+  margin-top: 5px;
+  font-size: 0.68rem;
+  font-weight: 500;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  padding: 2px 9px;
+  color: #ffffff;
+background: rgba(255, 255, 255, 0.15);
+border: 1px solid rgba(255, 255, 255, 0.25);
+}
+
