@@ -70,13 +70,8 @@ body {
 
 /* Popup styling */
 .popup-content {
-  display: none;
-  padding: 0 1.25rem 1.5rem;
-}
-
-/* Show content when active */
-.popup-content.active {
   display: block;
+  padding: 0 1.25rem 1.5rem;
 }
 
 /* Flag + name row */
