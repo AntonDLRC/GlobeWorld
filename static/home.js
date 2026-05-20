@@ -144,23 +144,18 @@ async function onCountryClick(d) {
   }
 }
 
-/* popup functions*/
 function showLoading() {
+  // just open the popup, content fills in when ready
   document.getElementById('popup').classList.add('visible');
-  document.getElementById('popup-loading').classList.add('active');
-  document.getElementById('popup-content').classList.remove('active');
-  document.getElementById('popup-error').classList.remove('active');
 }
 
-/* error message if something fails */
 function showError(msg) {
-  document.getElementById('popup-loading').classList.remove('active');
-  document.getElementById('popup-error').classList.add('active');
-  document.getElementById('popup-error-msg').textContent = msg;
+  // silently fail — just close the popup
+  document.getElementById('popup').classList.remove('visible');
+  selected = null;
 }
 
 function renderPopup(info) {
-  // Fill every field in the popup with country data
   document.getElementById('popup-flag').src             = info.flag;
   document.getElementById('popup-flag').alt             = info.flagAlt;
   document.getElementById('popup-name').textContent     = info.name;
@@ -176,10 +171,7 @@ function renderPopup(info) {
   document.getElementById('popup-un').textContent         = info.un;
   document.getElementById('popup-desc-text').textContent  = info.description;
 
-  // Switch from loading state to content state
-  document.getElementById('popup-loading').classList.remove('active');
-  document.getElementById('popup-error').classList.remove('active');
-  document.getElementById('popup-content').classList.add('active');
+  document.getElementById('popup').classList.add('visible');
 }
 
 // Close button — hides the popup and deselects the country
