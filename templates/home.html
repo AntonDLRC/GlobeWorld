@@ -87,6 +87,38 @@
 
 </div>
 
+<!-- Create a search bar  -->
+<div class="search-bar">
+
+    <div class="search-box">
+
+        <!-- Text box where user types -->
+        <input
+            id="search-input"
+            type="text"
+            placeholder="Search a country…"
+            autocomplete="off"
+            spellcheck="false"
+        />
+
+        <!-- Magnifying glass button -->
+        <button id="search-btn" aria-label="Search">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none"
+                 stroke="currentColor" stroke-width="2.2"
+                 stroke-linecap="round" stroke-linejoin="round">
+                <circle cx="11" cy="11" r="8"/>
+                <line x1="21" y1="21" x2="16.65" y2="16.65"/>
+            </svg>
+        </button>
+
+    </div>
+
+    <!-- The suggestion dropdown — starts empty.
+         home.js fills it with country names as you type. -->
+    <ul id="search-dropdown" class="search-dropdown"></ul>
+
+</div>
+
 <!-- loaded from the internet -->
 <script src="https://unpkg.com/globe.gl"></script>
 <script src="{{ url_for('static', filename='home.js') }}"></script>
