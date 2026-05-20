@@ -181,6 +181,32 @@ document.getElementById('popup-close').addEventListener('click', () => {
   globe.polygonCapColor(capColor).polygonAltitude(capAlt);
 });
 
+/* Search Bar - when user types it fetch result from the rescountries.com and it also shows a dropdown of the countries. */
+const searchInput    = document.getElementById('search-input');
+const searchDropdown = document.getElementById('search-dropdown');
+let   searchTimer    = null;
+
+// Listen for typing — wait 250ms after user stops before searching
+searchInput.addEventListener('input', () => {
+  clearTimeout(searchTimer);
+  const query = searchInput.value.trim();
+
+  if (query.length < 2) {
+    searchDropdown.innerHTML = '';
+    return;
+  }
+
+  // Fetch matching countries from REST Countries API
+  searchTimer = setTimeout(() => {
+    fetch(`https://restcountries.com/v3.1/name/${encodeURIComponent(query)}?fields=name,cca2,latlng`)
+      .then(r => r.ok ? r.json() : [])
+      .then(results => buildDropdown(results, query))
+      .catch(() => { searchDropdown.innerHTML = ''; });
+  }, 250);
+});
+
+
+
 /* helper functions to format country data */
 // Get the currency name and symbol e.g. "US Dollar ($)"
 function getCurrency(currencies) {
