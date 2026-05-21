@@ -205,6 +205,19 @@ searchInput.addEventListener('input', () => {
   }, 250);
 });
 
+// Press Enter → pick the first result in the dropdown
+searchInput.addEventListener('keydown', e => {
+  if (e.key === 'Enter') {
+    const first = searchDropdown.querySelector('li');
+    if (first) first.click();
+  }
+  if (e.key === 'Escape') {
+    searchDropdown.innerHTML = '';
+    searchInput.blur();
+  }
+});
+
+
 
 
 /* helper functions to format country data */
