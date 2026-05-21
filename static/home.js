@@ -217,6 +217,11 @@ searchInput.addEventListener('keydown', e => {
   }
 });
 
+// Click the search button → pick the first result
+document.getElementById('search-btn').addEventListener('click', () => {
+  const first = searchDropdown.querySelector('li');
+  if (first) first.click();
+});
 
 
 
