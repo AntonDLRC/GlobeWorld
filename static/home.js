@@ -228,6 +228,46 @@ searchInput.addEventListener('blur', () => {
   setTimeout(() => { searchDropdown.innerHTML = ''; }, 200);
 });
 
+// Build the dropdown list from search results
+function buildDropdown(results, query) {
+  searchDropdown.innerHTML = '';
+  if (!results || !results.length) return;
+
+  // Sort: countries starting with the query come first
+  results
+    .sort((a, b) => {
+      const aStarts = a.name.common.toLowerCase().startsWith(query.toLowerCase()) ? 0 : 1;
+      const bStarts = b.name.common.toLowerCase().startsWith(query.toLowerCase()) ? 0 : 1;
+      return aStarts - bStarts;
+    })
+    .slice(0, 8)
+    .forEach(c => {
+      const item = document.createElement('li');
+
+      // Bold the letters that match what was typed
+      const name  = c.name.common;
+      const i     = name.toLowerCase().indexOf(query.toLowerCase());
+      if (i >= 0) {
+        item.innerHTML =
+          name.slice(0, i) +
+          `<strong>${name.slice(i, i + query.length)}</strong>` +
+          name.slice(i + query.length);
+      } else {
+        item.textContent = name;
+      }
+
+      // Click a result → fly the globe to that country
+      item.addEventListener('mousedown', e => {
+        e.preventDefault();
+        searchInput.value        = name;
+        searchDropdown.innerHTML = '';
+        flyToCountry(c);
+      });
+
+      searchDropdown.appendChild(item);
+    });
+}
+
 
 
 /* helper functions to format country data */
