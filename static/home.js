@@ -223,6 +223,11 @@ document.getElementById('search-btn').addEventListener('click', () => {
   if (first) first.click();
 });
 
+// Hide dropdown when user clicks somewhere else
+searchInput.addEventListener('blur', () => {
+  setTimeout(() => { searchDropdown.innerHTML = ''; }, 200);
+});
+
 
 
 /* helper functions to format country data */
