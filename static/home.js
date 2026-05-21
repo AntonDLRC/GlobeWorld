@@ -268,6 +268,48 @@ function buildDropdown(results, query) {
     });
 }
 
+// Fly the globe to a searched country and load its popup
+function flyToCountry(c) {
+  const latlng = c.latlng || [0, 0];
+  globe.pointOfView({ lat: latlng[0], lng: latlng[1], altitude: 2.0 }, 1200);
+  showLoading();
+
+  // Fetch full country details then show popup
+  fetch(`https://restcountries.com/v3.1/alpha/${c.cca2}`)
+    .then(r => r.json())
+    .then(async data => {
+      const country = data[0];
+      const iso2    = country.cca2;
+
+      let description = 'No historical description available.';
+      try {
+        const dbRes = await fetch(`/api/country/${iso2}`);
+        if (dbRes.ok) {
+          const dbData = await dbRes.json();
+          description  = dbData.description || description;
+        }
+      } catch (_) {}
+
+      renderPopup({
+        name:       country.name.common,
+        official:   country.name.official,
+        flag:       country.flags?.svg || '',
+        flagAlt:    country.flags?.alt || `Flag of ${country.name.common}`,
+        capital:    country.capital?.[0]                ?? 'N/A',
+        population: country.population?.toLocaleString() ?? 'N/A',
+        region:     country.subregion  ?? country.region ?? 'N/A',
+        area:       country.area ? country.area.toLocaleString() + ' km²' : 'N/A',
+        currency:   getCurrency(country.currencies),
+        languages:  getLanguages(country.languages),
+        calling:    getCallingCode(country.idd),
+        timezone:   country.timezones?.[0]              ?? 'N/A',
+        un:         country.unMember ? '✓ Member' : 'Non-member',
+        description,
+      });
+    })
+    .catch(err => showError(err.message));
+}
+
 
 
 /* helper functions to format country data */
