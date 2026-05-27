@@ -272,7 +272,6 @@ function buildDropdown(results, query) {
 function flyToCountry(c) {
   const latlng = c.latlng || [0, 0];
   globe.pointOfView({ lat: latlng[0], lng: latlng[1], altitude: 2.0 }, 1200);
-  showLoading();
 
   // Fetch full country details then show popup
   fetch(`https://restcountries.com/v3.1/alpha/${c.cca2}`)
