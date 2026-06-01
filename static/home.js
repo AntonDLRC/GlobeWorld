@@ -284,6 +284,13 @@ function flyToCountry(c) {
       if (match) {
        selected = match;
        globe.polygonCapColor(capColor).polygonAltitude(capAlt);
+      } else {
+        // fallback: try matching with leading zeros removed
+        const match2 = globe.polygonsData().find(p => String(p.id) === String(parseInt(country.ccn3)));
+       if (match2) {
+         selected = match2;
+          globe.polygonCapColor(capColor).polygonAltitude(capAlt);
+       }
       }
 
 
