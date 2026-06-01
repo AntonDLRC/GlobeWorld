@@ -78,15 +78,30 @@ controls.dampingFactor   = 0.07;
 
 // Pause auto-rotation on mouse hover, resume on mouse out
 let spinTimer     = null;
+let popupOpen     = false;
 const globeCanvas = globe.renderer().domElement;
 
-// Stop spinning when user grabs the globe
-globeCanvas.addEventListener('mousedown',  () => { clearTimeout(spinTimer); controls.autoRotate = false; });
-globeCanvas.addEventListener('touchstart', () => { clearTimeout(spinTimer); controls.autoRotate = false; }, { passive: true });
+function pauseAutoRotate() {
+  clearTimeout(spinTimer);
+  controls.autoRotate = false;
+}
 
-// Resume spinning 3 seconds after user lets go
-globeCanvas.addEventListener('mouseup',    () => { spinTimer = setTimeout(() => { controls.autoRotate = true; }, 3000); });
-globeCanvas.addEventListener('touchend',   () => { spinTimer = setTimeout(() => { controls.autoRotate = true; }, 3000); }, { passive: true });
+function resumeAutoRotate(delay = 3000) {
+  clearTimeout(spinTimer);
+  if (delay > 0) {
+    spinTimer = setTimeout(() => { controls.autoRotate = true; }, delay);
+  } else {
+    controls.autoRotate = true;
+  }
+}
+
+// Stop spinning when user grabs the globe
+globeCanvas.addEventListener('mousedown',  () => { pauseAutoRotate(); });
+globeCanvas.addEventListener('touchstart', () => { pauseAutoRotate(); }, { passive: true });
+
+// Resume spinning 3 seconds after user lets go, but only if no popup is open
+globeCanvas.addEventListener('mouseup',    () => { if (!popupOpen) resumeAutoRotate(3000); });
+globeCanvas.addEventListener('touchend',   () => { if (!popupOpen) resumeAutoRotate(3000); }, { passive: true });
 
 /* Country Click Handler */
 // This function is called when a country is clicked. It fetches data from the REST Countries API and your Flask backend, then shows a popup with the information.
@@ -98,6 +113,9 @@ async function onCountryClick(d) {
   showLoading();
 
   try {
+    pauseAutoRotate();
+    popupOpen = true;
+
     // Step 1 & 2 — get country data using numeric id
     const apiRes = await fetch(`https://restcountries.com/v3.1/alpha?codes=${d.id}`);
     if (!apiRes.ok) throw new Error(`restcountries error ${apiRes.status}`);
@@ -145,12 +163,15 @@ async function onCountryClick(d) {
 }
 
 function showLoading() {
-  // just open the popup, content fills in when ready
+  popupOpen = true;
+  pauseAutoRotate();
   document.getElementById('popup').classList.add('visible');
 }
 
 function showError(msg) {
   // silently fail — just close the popup
+  popupOpen = false;
+  resumeAutoRotate(3000);
   document.getElementById('popup').classList.remove('visible');
   selected = null;
 }
@@ -176,9 +197,11 @@ function renderPopup(info) {
 
 // Close button — hides the popup and deselects the country
 document.getElementById('popup-close').addEventListener('click', () => {
+  popupOpen = false;
   document.getElementById('popup').classList.remove('visible');
   selected = null;
   globe.polygonCapColor(capColor).polygonAltitude(capAlt);
+  resumeAutoRotate(3000);
 });
 
 /* Search Bar - when user types it fetch result from the rescountries.com and it also shows a dropdown of the countries. */
@@ -272,6 +295,8 @@ function buildDropdown(results, query) {
 function flyToCountry(c) {
   const latlng = c.latlng || [0, 0];
   globe.pointOfView({ lat: latlng[0], lng: latlng[1], altitude: 2.0 }, 1200);
+  pauseAutoRotate();
+  popupOpen = true;
 
   // Fetch full country details then show popup
   fetch(`https://restcountries.com/v3.1/alpha/${c.cca2}`)
