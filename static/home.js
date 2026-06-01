@@ -280,6 +280,14 @@ function flyToCountry(c) {
       const country = data[0];
       const iso2    = country.cca2;
 
+      const match = globe.polygonsData().find(p => p.id == country.ccn3);
+      if (match) {
+       selected = match;
+       globe.polygonCapColor(capColor).polygonAltitude(capAlt);
+      }
+
+
+
       let description = 'No historical description available.';
       try {
         const dbRes = await fetch(`/api/country/${iso2}`);
