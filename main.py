@@ -33,6 +33,14 @@ def get_country(iso2):
 
     return jsonify({"description": row["description"]})
 
+# Select all my iso2 in my database and return as JSON list.
+@app.route("/api/countries")
+def get_all_countries():
+    conn = get_db()
+    rows = conn.execute("SELECT iso2 FROM countries").fetchall()
+    conn.close()
+    return jsonify({"iso2_list": [row["iso2"] for row in rows]})
+
 
 if __name__ == "__main__":
     app.run(debug=True, port=5245)
