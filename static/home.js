@@ -68,6 +68,15 @@ fetch('https://restcountries.com/v3.1/all?fields=name,ccn3')
     });
   });
 
+/* This set stores the list of the ISO2 codes that is in my database */
+const validISO2 = new Set();
+
+fetch('/api/countries')
+  .then(r => r.json())
+  .then(data => {
+    data.iso2_list.forEach(code => validISO2.add(code));
+  });
+
 /* Globe Auto Spinning */
 
 const controls = globe.controls();
