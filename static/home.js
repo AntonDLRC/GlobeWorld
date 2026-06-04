@@ -59,12 +59,17 @@ function capAlt(d) {
 }
 
 // Used to show the country name when hovering
-const nameMap = new Map();
-fetch('https://restcountries.com/v3.1/all?fields=name,ccn3')
+const nameMap    = new Map(); // ccn3 → common name
+const ccn3ToISO2 = new Map(); // ccn3 → iso2
+
+fetch('https://restcountries.com/v3.1/all?fields=name,ccn3,cca2')
   .then(r => r.json())
   .then(list => {
     list.forEach(c => {
-      if (c.ccn3) nameMap.set(c.ccn3, c.name.common);
+      if (c.ccn3) {
+        nameMap.set(c.ccn3, c.name.common);
+        ccn3ToISO2.set(c.ccn3, c.cca2);
+      }
     });
   });
 
