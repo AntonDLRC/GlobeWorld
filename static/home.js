@@ -274,8 +274,8 @@ function buildDropdown(results, query) {
   searchDropdown.innerHTML = '';
   if (!results || !results.length) return;
 
-  // Sort: countries starting with the query come first
   results
+    .filter(c => validISO2.has(c.cca2))   // ← add this filter
     .sort((a, b) => {
       const aStarts = a.name.common.toLowerCase().startsWith(query.toLowerCase()) ? 0 : 1;
       const bStarts = b.name.common.toLowerCase().startsWith(query.toLowerCase()) ? 0 : 1;
