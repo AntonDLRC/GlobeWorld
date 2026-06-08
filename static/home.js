@@ -385,3 +385,11 @@ function getCallingCode(idd) {
   if (!idd || !idd.root) return 'N/A';
   return idd.root + (idd.suffixes?.[0] || '');
 }
+
+// Check if a country is in the valid list based on its numeric id
+function isValidCountry(d) {
+  if (!d) return false;
+  const id   = String(d.id).padStart(3, '0');
+  const iso2 = ccn3ToISO2.get(id);
+  return iso2 ? validISO2.has(iso2) : false;
+}
