@@ -22,14 +22,16 @@ const globe = Globe()(document.getElementById('globe-container'))
     return name ? `<div class="globe-label">${name}</div>` : '';
   })
   .onPolygonHover(d => {
-    hovered = d || null;
-    document.body.style.cursor = d ? 'pointer' : 'default';
-    globe.polygonCapColor(capColor).polygonAltitude(capAlt);
+  if (d && !isValidCountry(d)) return;   // ← add this line
+  hovered = d || null;
+  document.body.style.cursor = d ? 'pointer' : 'default';
+  globe.polygonCapColor(capColor).polygonAltitude(capAlt);
   })
   .onPolygonClick((d, e) => {
-    e.stopPropagation();
-    onCountryClick(d);
-  });
+  e.stopPropagation();
+  if (!isValidCountry(d)) return;   // ← add this line
+  onCountryClick(d);
+  })
 
 window.addEventListener('resize', () =>
   globe.width(window.innerWidth).height(window.innerHeight)
