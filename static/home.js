@@ -44,17 +44,19 @@ fetch('https://cdn.jsdelivr.net/npm/world-atlas@2.0.2/countries-110m.json')
   });
 
 
-// color function for the globe
+// country color
 function capColor(d) {
-    if (d === selected) return 'rgba(56,189,248,0.95)';  // clicked → bright blue
-    if (d === hovered)  return 'rgba(45,212,191,0.90)';  // hovered → bright teal
-    return 'rgba(99,155,230,0.55)';                       // default → lighter blue
+  if (!isValidCountry(d)) return 'rgba(60,60,60,0.25)';   // not in DB → dim grey
+  if (d === selected)     return 'rgba(56,189,248,0.95)';
+  if (d === hovered)      return 'rgba(45,212,191,0.90)';
+  return 'rgba(99,155,230,0.55)';
 }
 
-// when cursor on the country it will lift them slightly
+// country altitude - higher when hovered or selected
 function capAlt(d) {
-  if (d === selected) return 0.02;
-  if (d === hovered)  return 0.014;
+  if (!isValidCountry(d)) return 0.002;   // barely lifts
+  if (d === selected)     return 0.02;
+  if (d === hovered)      return 0.014;
   return 0.006;
 }
 
