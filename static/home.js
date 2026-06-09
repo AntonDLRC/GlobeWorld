@@ -150,11 +150,13 @@ async function onCountryClick(d) {
 
     // Step 3 — fetch history description from your Flask database
     let description = 'No historical description available.';
+    let places = '';
     try {
       const dbRes = await fetch(`/api/country/${iso2}`);
       if (dbRes.ok) {
         const dbData = await dbRes.json();
         description  = dbData.description || description;
+        places = dbData.places || '';
       }
     } catch (_) { /* keep fallback description */ }
     // Step 4 — fill and show the popup
@@ -173,6 +175,7 @@ async function onCountryClick(d) {
       timezone:   c.timezones?.[0]            ?? 'N/A',
       un:         c.unMember ? '✓ Member' : 'Non-member',
       description,
+      places,
     });
 
   } catch (err) {
@@ -209,6 +212,7 @@ function renderPopup(info) {
   document.getElementById('popup-timezone').textContent   = info.timezone;
   document.getElementById('popup-un').textContent         = info.un;
   document.getElementById('popup-desc-text').textContent  = info.description;
+  document.getElementById('popup-places').textContent = info.places || 'No places listed yet.';
 
   document.getElementById('popup').classList.add('visible');
 }
@@ -339,11 +343,13 @@ function flyToCountry(c) {
 
 
       let description = 'No historical description available.';
+      let places = '';
       try {
         const dbRes = await fetch(`/api/country/${iso2}`);
         if (dbRes.ok) {
           const dbData = await dbRes.json();
           description  = dbData.description || description;
+          places = dbData.places || '';
         }
       } catch (_) {}
 
@@ -362,6 +368,7 @@ function flyToCountry(c) {
         timezone:   country.timezones?.[0]              ?? 'N/A',
         un:         country.unMember ? '✓ Member' : 'Non-member',
         description,
+        places,
       });
     })
     .catch(err => showError(err.message));
