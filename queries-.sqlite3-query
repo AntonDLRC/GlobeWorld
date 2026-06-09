@@ -6,3 +6,6 @@ CREATE TABLE countries (
     iso2 TEXT PRIMARY KEY,   -- e.g. 'US', 'GB', 'JP'
     description TEXT NOT NULL
 );
+
+UPDATE countries SET places = 'Gobi Desert, Khuvsgul Lake, Orkhon Valley, Karakorum Ancient Capital, Terelj National Park' WHERE iso2 = 'MN';
+UPDATE countries SET places = 'Bagan Temples, Inle Lake, Shwedagon Pagoda, Mandalay Palace, Ngapali Beach' WHERE iso2 = 'MM';
