@@ -23,7 +23,7 @@ def home():
 def get_country(iso2):
     conn = get_db()
     row = conn.execute(
-        "SELECT description FROM countries WHERE iso2 = ?",
+        "SELECT description, places FROM countries WHERE iso2 = ?",
         (iso2.upper(),)
     ).fetchone()
     conn.close()
@@ -31,7 +31,10 @@ def get_country(iso2):
     if row is None:
         return jsonify({"error": "Country not found"}), 404
 
-    return jsonify({"description": row["description"]})
+    return jsonify({
+        "description": row["description"],
+        "places": row["places"] or ""
+    })
 
 # Select all my iso2 in my database and return as JSON list.
 @app.route("/api/countries")
