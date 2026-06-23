@@ -3,6 +3,34 @@
 let hovered = null;
 let selected = null;
 
+// These get filled once all data finishes loading (see Promise.all below)
+const nameMap     = new Map(); // ccn3 → common name
+const ccn3ToISO2  = new Map(); // ccn3 → iso2
+const cca2Map     = new Map(); // iso2 → full country object
+const validISO2   = new Set(); // iso2 codes that are in our database
+let   allCountries = [];       // full country list, used for search
+
+function isValidCountry(d) {
+  if (!d) return false;
+  const id   = String(d.id).padStart(3, '0');
+  const iso2 = ccn3ToISO2.get(id);
+  return iso2 ? validISO2.has(iso2) : false;
+}
+
+function capColor(d) {
+  if (!isValidCountry(d)) return 'rgba(60,60,60,0.25)';   // not in DB → dim grey
+  if (d === selected)     return 'rgba(56,189,248,0.95)';
+  if (d === hovered)      return 'rgba(45,212,191,0.90)';
+  return 'rgba(99,155,230,0.55)';
+}
+
+function capAlt(d) {
+  if (!isValidCountry(d)) return 0.002;
+  if (d === selected)     return 0.02;
+  if (d === hovered)      return 0.014;
+  return 0.006;
+}
+
 // Build the globe
 const globe = Globe()(document.getElementById('globe-container'))
   .width(window.innerWidth)
@@ -22,69 +50,49 @@ const globe = Globe()(document.getElementById('globe-container'))
     return name ? `<div class="globe-label">${name}</div>` : '';
   })
   .onPolygonHover(d => {
-  if (d && !isValidCountry(d)) return;   // ← add this line
-  hovered = d || null;
-  document.body.style.cursor = d ? 'pointer' : 'default';
-  globe.polygonCapColor(capColor).polygonAltitude(capAlt);
+    if (d && !isValidCountry(d)) {
+      document.body.style.cursor = 'default';
+      return;
+    }
+    hovered = d || null;
+    document.body.style.cursor = d ? 'pointer' : 'default';
+    globe.polygonCapColor(capColor).polygonAltitude(capAlt);
   })
   .onPolygonClick((d, e) => {
-  e.stopPropagation();
-  if (!isValidCountry(d)) return;   // ← add this line
-  onCountryClick(d);
-  })
+    e.stopPropagation();
+    if (!isValidCountry(d)) return;
+    onCountryClick(d);
+  });
 
 window.addEventListener('resize', () =>
   globe.width(window.innerWidth).height(window.innerHeight)
 );
 
-// Load the country border shapes from CDN
-fetch('https://cdn.jsdelivr.net/npm/world-atlas@2.0.2/countries-110m.json')
-  .then(r => r.json())
-  .then(world => {
-    const countries = topojson.feature(world, world.objects.countries);
-    globe.polygonsData(countries.features);
+// Load EVERYTHING first, then draw the globe — this avoids any race conditions
+Promise.all([
+  fetch('https://cdn.jsdelivr.net/npm/world-atlas@2.0.2/countries-110m.json').then(r => r.json()),
+  fetch('/api/all-countries').then(r => r.json()),
+  fetch('/api/countries').then(r => r.json())
+
+]).then(([world, countryList, dbData]) => {
+
+  allCountries = countryList;
+
+  countryList.forEach(c => {
+    if (c.ccn3) {
+      nameMap.set(c.ccn3, c.name.common);
+      ccn3ToISO2.set(c.ccn3, c.cca2);
+    }
+    if (c.cca2) cca2Map.set(c.cca2, c);
   });
 
+  dbData.iso2_list.forEach(code => validISO2.add(code));
 
-// country color
-function capColor(d) {
-  if (!isValidCountry(d)) return 'rgba(60,60,60,0.25)';   // not in DB → dim grey
-  if (d === selected)     return 'rgba(56,189,248,0.95)';
-  if (d === hovered)      return 'rgba(45,212,191,0.90)';
-  return 'rgba(99,155,230,0.55)';
-}
+  const countries = topojson.feature(world, world.objects.countries);
+  globe.polygonsData(countries.features);
 
-// country altitude - higher when hovered or selected
-function capAlt(d) {
-  if (!isValidCountry(d)) return 0.002;   // barely lifts
-  if (d === selected)     return 0.02;
-  if (d === hovered)      return 0.014;
-  return 0.006;
-}
+}).catch(err => console.error('Failed to load globe data:', err));
 
-// Used to show the country name when hovering
-const nameMap    = new Map(); // ccn3 → common name
-const ccn3ToISO2 = new Map(); // ccn3 → iso2
-
-fetch('https://restcountries.com/v3.1/all?fields=name,ccn3,cca2')
-  .then(r => r.json())
-  .then(list => {
-    list.forEach(c => {
-      if (c.ccn3) {
-        nameMap.set(c.ccn3, c.name.common);
-        ccn3ToISO2.set(c.ccn3, c.cca2);
-      }
-    });
-  });
-
-/* This set stores the list of the ISO2 codes that is in my database */
-const validISO2 = new Set();
-
-fetch('/api/countries')
-  .then(r => r.json())
-  .then(data => {
-    data.iso2_list.forEach(code => validISO2.add(code));
-  });
 
 /* Globe Auto Spinning */
 
@@ -94,7 +102,6 @@ controls.autoRotateSpeed = 0.38;
 controls.enableDamping   = true;
 controls.dampingFactor   = 0.07;
 
-// Pause auto-rotation on mouse hover, resume on mouse out
 let spinTimer     = null;
 let popupOpen     = false;
 const globeCanvas = globe.renderer().domElement;
@@ -106,23 +113,16 @@ function pauseAutoRotate() {
 
 function resumeAutoRotate(delay = 3000) {
   clearTimeout(spinTimer);
-  if (delay > 0) {
-    spinTimer = setTimeout(() => { controls.autoRotate = true; }, delay);
-  } else {
-    controls.autoRotate = true;
-  }
+  spinTimer = setTimeout(() => { controls.autoRotate = true; }, delay);
 }
 
-// Stop spinning when user grabs the globe
 globeCanvas.addEventListener('mousedown',  () => { pauseAutoRotate(); });
 globeCanvas.addEventListener('touchstart', () => { pauseAutoRotate(); }, { passive: true });
-
-// Resume spinning 3 seconds after user lets go, but only if no popup is open
 globeCanvas.addEventListener('mouseup',    () => { if (!popupOpen) resumeAutoRotate(3000); });
 globeCanvas.addEventListener('touchend',   () => { if (!popupOpen) resumeAutoRotate(3000); }, { passive: true });
 
-/* Country Click Handler */
-// This function is called when a country is clicked. It fetches data from the REST Countries API and your Flask backend, then shows a popup with the information.
+
+/* Country Click Handler — now reads from the local countries.json instead of restcountries.com */
 async function onCountryClick(d) {
   if (!d) return;
 
@@ -134,21 +134,14 @@ async function onCountryClick(d) {
     pauseAutoRotate();
     popupOpen = true;
 
-    // Step 1 & 2 — get country data using numeric id
-    const apiRes = await fetch(`https://restcountries.com/v3.1/alpha?codes=${d.id}`);
-    if (!apiRes.ok) throw new Error(`restcountries error ${apiRes.status}`);
-
-    const data = await apiRes.json();
-    const c    = data[0];
+    const id   = String(d.id).padStart(3, '0');
+    const iso2 = ccn3ToISO2.get(id);
+    const c    = iso2 ? cca2Map.get(iso2) : null;
     if (!c) throw new Error('Country not found');
 
-    const iso2 = c.cca2;
-    
-    // Fly the globe to this country
     const latlng = c.latlng || [0, 0];
     globe.pointOfView({ lat: latlng[0], lng: latlng[1], altitude: 2.0 }, 1200);
 
-    // Step 3 — fetch history description from your Flask database
     let description = 'No historical description available.';
     let places = '';
     try {
@@ -156,23 +149,23 @@ async function onCountryClick(d) {
       if (dbRes.ok) {
         const dbData = await dbRes.json();
         description  = dbData.description || description;
-        places = dbData.places || '';
+        places       = dbData.places      || '';
       }
-    } catch (_) { /* keep fallback description */ }
-    // Step 4 — fill and show the popup
+    } catch (_) {}
+
     renderPopup({
       name:       c.name.common,
       official:   c.name.official,
-      flag:       c.flags?.svg || c.flags?.png || '',
+      flag: `https://flagcdn.com/w320/${iso2.toLowerCase()}.png`,
       flagAlt:    c.flags?.alt || `Flag of ${c.name.common}`,
-      capital:    c.capital?.[0]              ?? 'N/A',
+      capital:    c.capital?.[0]               ?? 'N/A',
       population: c.population?.toLocaleString() ?? 'N/A',
-      region:     c.subregion  ?? c.region    ?? 'N/A',
+      region:     c.subregion  ?? c.region     ?? 'N/A',
       area:       c.area ? c.area.toLocaleString() + ' km²' : 'N/A',
       currency:   getCurrency(c.currencies),
       languages:  getLanguages(c.languages),
       calling:    getCallingCode(c.idd),
-      timezone:   c.timezones?.[0]            ?? 'N/A',
+      timezone:   c.timezones?.[0]             ?? 'N/A',
       un:         c.unMember ? '✓ Member' : 'Non-member',
       description,
       places,
@@ -190,7 +183,6 @@ function showLoading() {
 }
 
 function showError(msg) {
-  // silently fail — just close the popup
   popupOpen = false;
   resumeAutoRotate(3000);
   document.getElementById('popup').classList.remove('visible');
@@ -212,12 +204,11 @@ function renderPopup(info) {
   document.getElementById('popup-timezone').textContent   = info.timezone;
   document.getElementById('popup-un').textContent         = info.un;
   document.getElementById('popup-desc-text').textContent  = info.description;
-  document.getElementById('popup-places').textContent = info.places || 'No places listed yet.';
+  document.getElementById('popup-places').textContent     = info.places || 'No places listed yet.';
 
   document.getElementById('popup').classList.add('visible');
 }
 
-// Close button — hides the popup and deselects the country
 document.getElementById('popup-close').addEventListener('click', () => {
   popupOpen = false;
   document.getElementById('popup').classList.remove('visible');
@@ -226,12 +217,12 @@ document.getElementById('popup-close').addEventListener('click', () => {
   resumeAutoRotate(3000);
 });
 
-/* Search Bar - when user types it fetch result from the rescountries.com and it also shows a dropdown of the countries. */
+
+/* Search Bar — now searches the local list instead of restcountries.com */
 const searchInput    = document.getElementById('search-input');
 const searchDropdown = document.getElementById('search-dropdown');
 let   searchTimer    = null;
 
-// Listen for typing — wait 250ms after user stops before searching
 searchInput.addEventListener('input', () => {
   clearTimeout(searchTimer);
   const query = searchInput.value.trim();
@@ -241,16 +232,15 @@ searchInput.addEventListener('input', () => {
     return;
   }
 
-  // Fetch matching countries from REST Countries API
   searchTimer = setTimeout(() => {
-    fetch(`https://restcountries.com/v3.1/name/${encodeURIComponent(query)}?fields=name,cca2,latlng`)
-      .then(r => r.ok ? r.json() : [])
-      .then(results => buildDropdown(results, query))
-      .catch(() => { searchDropdown.innerHTML = ''; });
+    const q = query.toLowerCase();
+    const results = allCountries.filter(c =>
+      c.name.common.toLowerCase().includes(q)
+    );
+    buildDropdown(results, query);
   }, 250);
 });
 
-// Press Enter → pick the first result in the dropdown
 searchInput.addEventListener('keydown', e => {
   if (e.key === 'Enter') {
     const first = searchDropdown.querySelector('li');
@@ -262,24 +252,21 @@ searchInput.addEventListener('keydown', e => {
   }
 });
 
-// Click the search button → pick the first result
 document.getElementById('search-btn').addEventListener('click', () => {
   const first = searchDropdown.querySelector('li');
   if (first) first.click();
 });
 
-// Hide dropdown when user clicks somewhere else
 searchInput.addEventListener('blur', () => {
   setTimeout(() => { searchDropdown.innerHTML = ''; }, 200);
 });
 
-// Build the dropdown list from search results
 function buildDropdown(results, query) {
   searchDropdown.innerHTML = '';
   if (!results || !results.length) return;
 
   results
-    .filter(c => validISO2.has(c.cca2))   // ← add this filter
+    .filter(c => validISO2.has(c.cca2))
     .sort((a, b) => {
       const aStarts = a.name.common.toLowerCase().startsWith(query.toLowerCase()) ? 0 : 1;
       const bStarts = b.name.common.toLowerCase().startsWith(query.toLowerCase()) ? 0 : 1;
@@ -288,8 +275,6 @@ function buildDropdown(results, query) {
     .slice(0, 8)
     .forEach(c => {
       const item = document.createElement('li');
-
-      // Bold the letters that match what was typed
       const name  = c.name.common;
       const i     = name.toLowerCase().indexOf(query.toLowerCase());
       if (i >= 0) {
@@ -301,7 +286,6 @@ function buildDropdown(results, query) {
         item.textContent = name;
       }
 
-      // Click a result → fly the globe to that country
       item.addEventListener('mousedown', e => {
         e.preventDefault();
         searchInput.value        = name;
@@ -313,94 +297,70 @@ function buildDropdown(results, query) {
     });
 }
 
-// Fly the globe to a searched country and load its popup
+// Fly the globe to a searched country — looks up locally, no fetch needed
 function flyToCountry(c) {
-  const latlng = c.latlng || [0, 0];
+  const country = cca2Map.get(c.cca2);
+  if (!country) return;
+
+  const latlng = country.latlng || [0, 0];
   globe.pointOfView({ lat: latlng[0], lng: latlng[1], altitude: 2.0 }, 1200);
   pauseAutoRotate();
   popupOpen = true;
 
-  // Fetch full country details then show popup
-  fetch(`https://restcountries.com/v3.1/alpha/${c.cca2}`)
-    .then(r => r.json())
-    .then(async data => {
-      const country = data[0];
-      const iso2    = country.cca2;
+  const match = globe.polygonsData().find(p => p.id == country.ccn3)
+             || globe.polygonsData().find(p => String(p.id) === String(parseInt(country.ccn3)));
+  if (match) {
+    selected = match;
+    globe.polygonCapColor(capColor).polygonAltitude(capAlt);
+  }
 
-      const match = globe.polygonsData().find(p => p.id == country.ccn3);
-      if (match) {
-       selected = match;
-       globe.polygonCapColor(capColor).polygonAltitude(capAlt);
-      } else {
-        // fallback: try matching with leading zeros removed
-        const match2 = globe.polygonsData().find(p => String(p.id) === String(parseInt(country.ccn3)));
-       if (match2) {
-         selected = match2;
-          globe.polygonCapColor(capColor).polygonAltitude(capAlt);
-       }
+  (async () => {
+    let description = 'No historical description available.';
+    let places = '';
+    try {
+      const dbRes = await fetch(`/api/country/${country.cca2}`);
+      if (dbRes.ok) {
+        const dbData = await dbRes.json();
+        description  = dbData.description || description;
+        places       = dbData.places      || '';
       }
+    } catch (_) {}
 
-
-
-      let description = 'No historical description available.';
-      let places = '';
-      try {
-        const dbRes = await fetch(`/api/country/${iso2}`);
-        if (dbRes.ok) {
-          const dbData = await dbRes.json();
-          description  = dbData.description || description;
-          places = dbData.places || '';
-        }
-      } catch (_) {}
-
-      renderPopup({
-        name:       country.name.common,
-        official:   country.name.official,
-        flag:       country.flags?.svg || '',
-        flagAlt:    country.flags?.alt || `Flag of ${country.name.common}`,
-        capital:    country.capital?.[0]                ?? 'N/A',
-        population: country.population?.toLocaleString() ?? 'N/A',
-        region:     country.subregion  ?? country.region ?? 'N/A',
-        area:       country.area ? country.area.toLocaleString() + ' km²' : 'N/A',
-        currency:   getCurrency(country.currencies),
-        languages:  getLanguages(country.languages),
-        calling:    getCallingCode(country.idd),
-        timezone:   country.timezones?.[0]              ?? 'N/A',
-        un:         country.unMember ? '✓ Member' : 'Non-member',
-        description,
-        places,
-      });
-    })
-    .catch(err => showError(err.message));
+    renderPopup({
+      name:       country.name.common,
+      official:   country.name.official,
+      flag: `https://flagcdn.com/w320/${country.cca2.toLowerCase()}.png`,
+      flagAlt:    country.flags?.alt || `Flag of ${country.name.common}`,
+      capital:    country.capital?.[0]                 ?? 'N/A',
+      population: country.population?.toLocaleString()  ?? 'N/A',
+      region:     country.subregion  ?? country.region  ?? 'N/A',
+      area:       country.area ? country.area.toLocaleString() + ' km²' : 'N/A',
+      currency:   getCurrency(country.currencies),
+      languages:  getLanguages(country.languages),
+      calling:    getCallingCode(country.idd),
+      timezone:   country.timezones?.[0]               ?? 'N/A',
+      un:         country.unMember ? '✓ Member' : 'Non-member',
+      description,
+      places,
+    });
+  })();
 }
 
 
-
 /* helper functions to format country data */
-// Get the currency name and symbol e.g. "US Dollar ($)"
 function getCurrency(currencies) {
   if (!currencies) return 'N/A';
   const first = Object.values(currencies)[0];
   return first ? `${first.name}${first.symbol ? ' (' + first.symbol + ')' : ''}` : 'N/A';
 }
 
-// Get up to 3 languages as a comma list e.g. "English, French…"
 function getLanguages(languages) {
   if (!languages) return 'N/A';
   const list = Object.values(languages);
   return list.length > 3 ? list.slice(0, 3).join(', ') + '…' : list.join(', ');
 }
 
-// Get the calling code e.g. "+1", "+44"
 function getCallingCode(idd) {
   if (!idd || !idd.root) return 'N/A';
   return idd.root + (idd.suffixes?.[0] || '');
-}
-
-// Check if a country is in the valid list based on its numeric id
-function isValidCountry(d) {
-  if (!d) return false;
-  const id   = String(d.id).padStart(3, '0');
-  const iso2 = ccn3ToISO2.get(id);
-  return iso2 ? validISO2.has(iso2) : false;
 }
