@@ -23,7 +23,7 @@ def home():
 def get_country(iso2):
     conn = get_db()
     row = conn.execute(
-        "SELECT description, places FROM countries WHERE iso2 = ?",
+        "SELECT description, places, timezone FROM countries WHERE iso2 = ?",
         (iso2.upper(),)
     ).fetchone()
     conn.close()
@@ -33,7 +33,8 @@ def get_country(iso2):
 
     return jsonify({
         "description": row["description"],
-        "places": row["places"] or ""
+        "places": row["places"] or "",
+        "timezone": row["timezone"] or "N/A"
     })
 
 # Select all my iso2 in my database and return as JSON list.
@@ -44,6 +45,9 @@ def get_all_countries():
     conn.close()
     return jsonify({"iso2_list": [row["iso2"] for row in rows]})
 
+@app.route("/api/all-countries")
+def all_countries():
+    return app.send_static_file('countries.json')
 
 if __name__ == "__main__":
     app.run(debug=True, port=5245)
