@@ -146,6 +146,7 @@ async function onCountryClick(d) {
     let description = 'No historical description available.';
     let places = '';
     let timezone = 'N/A';
+    let population = 'N/A'; 
     try {
      const dbRes = await fetch(`/api/country/${iso2}`);
       if (dbRes.ok) {
@@ -153,6 +154,7 @@ async function onCountryClick(d) {
         description  = dbData.description || description;
         places       = dbData.places      || '';
         timezone     = dbData.timezone    || 'N/A';  // ← now reads from DB
+        population  = dbData.population || 'N/A';
       }
     } catch (_) {}
 
@@ -162,7 +164,7 @@ async function onCountryClick(d) {
       flag: `https://flagcdn.com/w320/${iso2.toLowerCase()}.png`,
       flagAlt:    c.flags?.alt || `Flag of ${c.name.common}`,
       capital:    c.capital?.[0]               ?? 'N/A',
-      population: c.population ? c.population.toLocaleString() : 'N/A',
+      population,
       region:     c.subregion  ?? c.region     ?? 'N/A',
       area:       c.area ? c.area.toLocaleString() + ' km²' : 'N/A',
       currency:   getCurrency(c.currencies),
@@ -321,6 +323,7 @@ function flyToCountry(c) {
     let description = 'No historical description available.';
     let places = '';
     let timezone = 'N/A';
+    let population = 'N/A'; 
     try {
       const dbRes = await fetch(`/api/country/${country.cca2}`);
       if (dbRes.ok) {
@@ -328,6 +331,7 @@ function flyToCountry(c) {
         description  = dbData.description || description;
         places       = dbData.places      || '';
        timezone     = dbData.timezone    || 'N/A';
+       population  = dbData.population || 'N/A';
       }
     } catch (_) {}
 
@@ -337,7 +341,7 @@ function flyToCountry(c) {
       flag: `https://flagcdn.com/w320/${country.cca2.toLowerCase()}.png`,
       flagAlt:    country.flags?.alt || `Flag of ${country.name.common}`,
       capital:    country.capital?.[0]                 ?? 'N/A',
-      population: country.population ? country.population.toLocaleString() : 'N/A',
+      population,
       region:     country.subregion  ?? country.region  ?? 'N/A',
       area:       country.area ? country.area.toLocaleString() + ' km²' : 'N/A',
       currency:   getCurrency(country.currencies),
