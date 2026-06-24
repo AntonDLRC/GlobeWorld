@@ -137,6 +137,7 @@ async function onCountryClick(d) {
     const id   = String(d.id).padStart(3, '0');
     const iso2 = ccn3ToISO2.get(id);
     const c    = iso2 ? cca2Map.get(iso2) : null;
+    console.log(c);
     if (!c) throw new Error('Country not found');
 
     const latlng = c.latlng || [0, 0];
@@ -144,12 +145,14 @@ async function onCountryClick(d) {
 
     let description = 'No historical description available.';
     let places = '';
+    let timezone = 'N/A';
     try {
-      const dbRes = await fetch(`/api/country/${iso2}`);
+     const dbRes = await fetch(`/api/country/${iso2}`);
       if (dbRes.ok) {
         const dbData = await dbRes.json();
         description  = dbData.description || description;
         places       = dbData.places      || '';
+        timezone     = dbData.timezone    || 'N/A';  // ← now reads from DB
       }
     } catch (_) {}
 
@@ -159,13 +162,13 @@ async function onCountryClick(d) {
       flag: `https://flagcdn.com/w320/${iso2.toLowerCase()}.png`,
       flagAlt:    c.flags?.alt || `Flag of ${c.name.common}`,
       capital:    c.capital?.[0]               ?? 'N/A',
-      population: c.population?.toLocaleString() ?? 'N/A',
+      population: c.population ? c.population.toLocaleString() : 'N/A',
       region:     c.subregion  ?? c.region     ?? 'N/A',
       area:       c.area ? c.area.toLocaleString() + ' km²' : 'N/A',
       currency:   getCurrency(c.currencies),
       languages:  getLanguages(c.languages),
       calling:    getCallingCode(c.idd),
-      timezone:   c.timezones?.[0]             ?? 'N/A',
+      timezone,
       un:         c.unMember ? '✓ Member' : 'Non-member',
       description,
       places,
@@ -317,12 +320,14 @@ function flyToCountry(c) {
   (async () => {
     let description = 'No historical description available.';
     let places = '';
+    let timezone = 'N/A';
     try {
       const dbRes = await fetch(`/api/country/${country.cca2}`);
       if (dbRes.ok) {
-        const dbData = await dbRes.json();
+       const dbData = await dbRes.json();
         description  = dbData.description || description;
         places       = dbData.places      || '';
+       timezone     = dbData.timezone    || 'N/A';
       }
     } catch (_) {}
 
@@ -332,13 +337,13 @@ function flyToCountry(c) {
       flag: `https://flagcdn.com/w320/${country.cca2.toLowerCase()}.png`,
       flagAlt:    country.flags?.alt || `Flag of ${country.name.common}`,
       capital:    country.capital?.[0]                 ?? 'N/A',
-      population: country.population?.toLocaleString()  ?? 'N/A',
+      population: country.population ? country.population.toLocaleString() : 'N/A',
       region:     country.subregion  ?? country.region  ?? 'N/A',
       area:       country.area ? country.area.toLocaleString() + ' km²' : 'N/A',
       currency:   getCurrency(country.currencies),
       languages:  getLanguages(country.languages),
       calling:    getCallingCode(country.idd),
-      timezone:   country.timezones?.[0]               ?? 'N/A',
+      timezone,
       un:         country.unMember ? '✓ Member' : 'Non-member',
       description,
       places,

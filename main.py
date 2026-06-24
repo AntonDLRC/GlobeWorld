@@ -23,7 +23,7 @@ def home():
 def get_country(iso2):
     conn = get_db()
     row = conn.execute(
-        "SELECT description, places, timezone FROM countries WHERE iso2 = ?",
+        "SELECT description, places, timezone, population FROM countries WHERE iso2 = ?",
         (iso2.upper(),)
     ).fetchone()
     conn.close()
@@ -33,8 +33,9 @@ def get_country(iso2):
 
     return jsonify({
         "description": row["description"],
-        "places": row["places"] or "",
-        "timezone": row["timezone"] or "N/A"
+        "places":      row["places"]      or "",
+        "timezone":    row["timezone"]    or "N/A",
+        "population":  row["population"]  or "N/A"
     })
 
 # Select all my iso2 in my database and return as JSON list.
