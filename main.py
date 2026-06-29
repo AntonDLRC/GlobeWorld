@@ -50,5 +50,9 @@ def get_all_countries():
 def all_countries():
     return app.send_static_file('countries.json')
 
+@app.route("/map")
+def map_page():
+    return render_template("map.html")
+
 if __name__ == "__main__":
     app.run(debug=True, port=5245)
