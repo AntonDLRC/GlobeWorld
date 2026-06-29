@@ -187,3 +187,23 @@ border: 1px solid rgba(255, 255, 255, 0.25);
   cursor: pointer;
   border-bottom: 1px solid rgba(255, 255, 255, 0.06);
 }
+
+
+.switch-btn {
+  position: fixed;
+  top: 2.5rem;
+  left: 50%;
+  transform: translateX(-50%);
+  /* Make the button interactive and clickable (z-index) */
+  z-index: 30;
+  color: black;
+  border: 4px solid rgba(249, 247, 254, 0.788);
+  border-radius: 6px;
+  text-decoration: none;
+  background-color: #f1f1f1;
+}
+
+.switch-btn:hover {
+  background-color: black;
+  color: white;
+}
