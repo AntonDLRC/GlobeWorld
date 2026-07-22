@@ -69,5 +69,38 @@ function refreshColors() {
   g.selectAll('path.country').attr('fill', fillColor);
 }
 
+/* Tooltip, label on hover so when ur cursor on the country shape it will show the country name */
+
+const tooltip = d3.select('#map-container')
+  .append('div')
+  .attr('class', 'globe-label')
+  .style('position', 'fixed')
+  .style('pointer-events', 'none')
+  .style('opacity', 0)
+  .style('z-index', 15);
+
+function showTooltip(event, d) {
+  const id   = String(d.id).padStart(3, '0');
+  const name = nameMap.get(id) || '';
+  if (!name) return;
+  tooltip
+    .html(name)
+    .style('left', (event.clientX + 12) + 'px')
+    .style('top',  (event.clientY + 12) + 'px')
+    .style('opacity', 1);
+}
+
+function moveTooltip(event) {
+  tooltip
+    .style('left', (event.clientX + 12) + 'px')
+    .style('top',  (event.clientY + 12) + 'px');
+}
+
+function hideTooltip() {
+  tooltip.style('opacity', 0);
+}
+
+
+
 
 
