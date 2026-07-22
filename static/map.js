@@ -100,7 +100,58 @@ function hideTooltip() {
   tooltip.style('opacity', 0);
 }
 
+/* This load everything just like how home.js load its data */
 
+Promise.all([
+  fetch('https://cdn.jsdelivr.net/npm/world-atlas@2.0.2/countries-110m.json').then(r => r.json()),
+  fetch('/api/all-countries').then(r => r.json()),
+  fetch('/api/countries').then(r => r.json())
+]).then(([world, countryList, dbData]) => {
 
+  allCountries = countryList;
 
+  countryList.forEach(c => {
+    if (c.ccn3) {
+      nameMap.set(c.ccn3, c.name.common);
+      ccn3ToISO2.set(c.ccn3, c.cca2);
+    }
+    if (c.cca2) cca2Map.set(c.cca2, c);
+  });
+
+  dbData.iso2_list.forEach(code => validISO2.add(code));
+
+  const countries = topojson.feature(world, world.objects.countries);
+  countryFeatures = countries.features;
+
+  g.selectAll('path.country')
+    .data(countryFeatures)
+    .enter()
+    .append('path')
+    .attr('class', 'country')
+    .attr('fill', fillColor)
+    .attr('stroke', 'rgba(80,140,200,0.35)')
+    .attr('stroke-width', 0.5)
+    .style('cursor', d => (isValidCountry(d) ? 'pointer' : 'default'))
+    .on('mousemove', (event, d) => {
+      if (!isValidCountry(d)) { hideTooltip(); return; }
+      if (hovered !== d) {
+        hovered = d;
+        refreshColors();
+      }
+      showTooltip(event, d);
+    })
+    .on('mouseleave', () => {
+      hovered = null;
+      refreshColors();
+      hideTooltip();
+    })
+    .on('click', (event, d) => {
+      event.stopPropagation();
+      if (!isValidCountry(d)) return;
+      onCountryClick(d);
+    });
+
+  sizeToWindow();
+
+}).catch(err => console.error('Failed to load map data:', err));
 
