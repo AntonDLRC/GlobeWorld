@@ -49,3 +49,25 @@ const zoom = d3.zoom()
 
 svg.call(zoom);
 
+/* Coloring, same as capColor/capAlt in home.js */
+
+function isValidCountry(d) {
+  if (!d) return false;
+  const id   = String(d.id).padStart(3, '0');
+  const iso2 = ccn3ToISO2.get(id);
+  return iso2 ? validISO2.has(iso2) : false;
+}
+
+function fillColor(d) {
+  if (!isValidCountry(d)) return 'rgba(60,60,60,0.35)';
+  if (d === selected)     return 'rgba(56,189,248,0.95)';
+  if (d === hovered)      return 'rgba(45,212,191,0.90)';
+  return 'rgba(99,155,230,0.55)';
+}
+
+function refreshColors() {
+  g.selectAll('path.country').attr('fill', fillColor);
+}
+
+
+
