@@ -33,3 +33,19 @@ function sizeToWindow() {
 
 window.addEventListener('resize', sizeToWindow);
 
+/* Sphere / ocean background */
+g.append('path')
+  .attr('class', 'sphere')
+  .attr('fill', 'rgba(10,25,55,0.55)')
+  .attr('stroke', 'rgba(80,140,200,0.25)')
+  .attr('stroke-width', 1);
+
+/* Zoom / pan */
+const zoom = d3.zoom()
+  .scaleExtent([1, 8])
+  .on('zoom', (event) => {
+    g.attr('transform', event.transform);
+  });
+
+svg.call(zoom);
+
