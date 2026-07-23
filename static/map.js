@@ -401,6 +401,24 @@ function flyToCountry(c) {
   })();
 }
 
+/* ---------- helper functions (same as home.js) ---------- */
+
+function getCurrency(currencies) {
+  if (!currencies) return 'N/A';
+  const first = Object.values(currencies)[0];
+  return first ? `${first.name}${first.symbol ? ' (' + first.symbol + ')' : ''}` : 'N/A';
+}
+
+function getLanguages(languages) {
+  if (!languages) return 'N/A';
+  const list = Object.values(languages);
+  return list.length > 3 ? list.slice(0, 3).join(', ') + '…' : list.join(', ');
+}
+
+function getCallingCode(idd) {
+  if (!idd || !idd.root) return 'N/A';
+  return idd.root + (idd.suffixes?.[0] || '');
+}
 
 
 
