@@ -349,6 +349,59 @@ function buildDropdown(results, query) {
     });
 }
 
+function flyToCountry(c) {
+  const country = cca2Map.get(c.cca2);
+  if (!country) return;
+
+  // find the matching topojson feature so we can zoom to its actual bounds
+  const feature = countryFeatures.find(f => f.id == country.ccn3)
+               || countryFeatures.find(f => String(f.id) === String(parseInt(country.ccn3)));
+
+  if (feature) {
+    selected = feature;
+    refreshColors();
+    flyToFeature(feature);
+  }
+
+  popupOpen = true;
+
+  (async () => {
+    let description = 'No historical description available.';
+    let places = '';
+    let timezone = 'N/A';
+    let population = 'N/A';
+    try {
+      const dbRes = await fetch(`/api/country/${country.cca2}`);
+      if (dbRes.ok) {
+        const dbData = await dbRes.json();
+        description = dbData.description || description;
+        places      = dbData.places      || '';
+        timezone    = dbData.timezone    || 'N/A';
+        population  = dbData.population  || 'N/A';
+      }
+    } catch (_) {}
+
+    renderPopup({
+      name:       country.name.common,
+      official:   country.name.official,
+      flag:       `https://flagcdn.com/w320/${country.cca2.toLowerCase()}.png`,
+      flagAlt:    country.flags?.alt || `Flag of ${country.name.common}`,
+      capital:    country.capital?.[0]               ?? 'N/A',
+      population,
+      region:     country.subregion  ?? country.region ?? 'N/A',
+      area:       country.area ? country.area.toLocaleString() + ' km²' : 'N/A',
+      currency:   getCurrency(country.currencies),
+      languages:  getLanguages(country.languages),
+      calling:    getCallingCode(country.idd),
+      timezone,
+      un:         country.unMember ? '✓ Member' : 'Non-member',
+      description,
+      places,
+    });
+  })();
+}
+
+
 
 
 
