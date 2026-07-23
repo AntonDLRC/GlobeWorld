@@ -155,3 +155,60 @@ Promise.all([
 
 }).catch(err => console.error('Failed to load map data:', err));
 
+/* Country click handler, same as from the home.js */
+
+async function onCountryClick(d) {
+  if (!d) return;
+
+  selected = d;
+  refreshColors();
+  showLoading();
+
+  try {
+    popupOpen = true;
+
+    const id   = String(d.id).padStart(3, '0');
+    const iso2 = ccn3ToISO2.get(id);
+    const c    = iso2 ? cca2Map.get(iso2) : null;
+    if (!c) throw new Error('Country not found');
+
+    flyToFeature(d);
+
+    let description = 'No historical description available.';
+    let places = '';
+    let timezone = 'N/A';
+    let population = 'N/A';
+    try {
+      const dbRes = await fetch(`/api/country/${iso2}`);
+      if (dbRes.ok) {
+        const dbData = await dbRes.json();
+        description = dbData.description || description;
+        places      = dbData.places      || '';
+        timezone    = dbData.timezone    || 'N/A';
+        population  = dbData.population  || 'N/A';
+      }
+    } catch (_) {}
+
+    renderPopup({
+      name:       c.name.common,
+      official:   c.name.official,
+      flag:       `https://flagcdn.com/w320/${iso2.toLowerCase()}.png`,
+      flagAlt:    c.flags?.alt || `Flag of ${c.name.common}`,
+      capital:    c.capital?.[0]           ?? 'N/A',
+      population,
+      region:     c.subregion  ?? c.region ?? 'N/A',
+      area:       c.area ? c.area.toLocaleString() + ' km²' : 'N/A',
+      currency:   getCurrency(c.currencies),
+      languages:  getLanguages(c.languages),
+      calling:    getCallingCode(c.idd),
+      timezone,
+      un:         c.unMember ? '✓ Member' : 'Non-member',
+      description,
+      places,
+    });
+
+  } catch (err) {
+    showError(err.message);
+  }
+}
+
