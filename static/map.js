@@ -212,3 +212,60 @@ async function onCountryClick(d) {
   }
 }
 
+/* Zoom/pan the map so the clicked/searched country is centered */
+function flyToFeature(feature) {
+  const [[x0, y0], [x1, y1]] = path.bounds(feature);
+  const w = window.innerWidth;
+  const h = window.innerHeight;
+  const dx = x1 - x0;
+  const dy = y1 - y0;
+  const cx = (x0 + x1) / 2;
+  const cy = (y0 + y1) / 2;
+  const scale = Math.max(1, Math.min(8, 0.7 / Math.max(dx / w, dy / h)));
+  const translate = [w / 2 - scale * cx, h / 2 - scale * cy];
+
+  svg.transition().duration(1000).call(
+    zoom.transform,
+    d3.zoomIdentity.translate(translate[0], translate[1]).scale(scale)
+  );
+}
+
+function showLoading() {
+  popupOpen = true;
+  document.getElementById('popup').classList.add('visible');
+}
+
+function showError(msg) {
+  popupOpen = false;
+  document.getElementById('popup').classList.remove('visible');
+  selected = null;
+  refreshColors();
+}
+
+function renderPopup(info) {
+  document.getElementById('popup-flag').src             = info.flag;
+  document.getElementById('popup-flag').alt             = info.flagAlt;
+  document.getElementById('popup-name').textContent     = info.name;
+  document.getElementById('popup-official').textContent = info.official !== info.name ? info.official : '';
+  document.getElementById('popup-region-badge').textContent = info.region;
+  document.getElementById('popup-capital').textContent    = info.capital;
+  document.getElementById('popup-population').textContent = info.population;
+  document.getElementById('popup-area').textContent       = info.area;
+  document.getElementById('popup-currency').textContent   = info.currency;
+  document.getElementById('popup-languages').textContent  = info.languages;
+  document.getElementById('popup-calling').textContent    = info.calling;
+  document.getElementById('popup-timezone').textContent   = info.timezone;
+  document.getElementById('popup-un').textContent         = info.un;
+  document.getElementById('popup-desc-text').textContent  = info.description;
+  document.getElementById('popup-places').textContent     = info.places || 'No places listed yet.';
+
+  document.getElementById('popup').classList.add('visible');
+}
+
+document.getElementById('popup-close').addEventListener('click', () => {
+  popupOpen = false;
+  document.getElementById('popup').classList.remove('visible');
+  selected = null;
+  refreshColors();
+});
+
