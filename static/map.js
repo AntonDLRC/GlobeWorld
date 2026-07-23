@@ -269,3 +269,87 @@ document.getElementById('popup-close').addEventListener('click', () => {
   refreshColors();
 });
 
+/* Search bar, same as home.js */
+
+const searchInput    = document.getElementById('search-input');
+const searchDropdown = document.getElementById('search-dropdown');
+let   searchTimer    = null;
+
+searchInput.addEventListener('input', () => {
+  clearTimeout(searchTimer);
+  const query = searchInput.value.trim();
+
+  if (query.length < 2) {
+    searchDropdown.innerHTML = '';
+    return;
+  }
+
+  searchTimer = setTimeout(() => {
+    const q = query.toLowerCase();
+    const results = allCountries.filter(c =>
+      c.name.common.toLowerCase().includes(q)
+    );
+    buildDropdown(results, query);
+  }, 250);
+});
+
+searchInput.addEventListener('keydown', e => {
+  if (e.key === 'Enter') {
+    const first = searchDropdown.querySelector('li');
+    if (first) first.click();
+  }
+  if (e.key === 'Escape') {
+    searchDropdown.innerHTML = '';
+    searchInput.blur();
+  }
+});
+
+document.getElementById('search-btn').addEventListener('click', () => {
+  const first = searchDropdown.querySelector('li');
+  if (first) first.click();
+});
+
+searchInput.addEventListener('blur', () => {
+  setTimeout(() => { searchDropdown.innerHTML = ''; }, 200);
+});
+
+function buildDropdown(results, query) {
+  searchDropdown.innerHTML = '';
+  if (!results || !results.length) return;
+
+  results
+    .filter(c => validISO2.has(c.cca2))
+    .sort((a, b) => {
+      const aStarts = a.name.common.toLowerCase().startsWith(query.toLowerCase()) ? 0 : 1;
+      const bStarts = b.name.common.toLowerCase().startsWith(query.toLowerCase()) ? 0 : 1;
+      return aStarts - bStarts;
+    })
+    .slice(0, 8)
+    .forEach(c => {
+      const item = document.createElement('li');
+      const name  = c.name.common;
+      const i     = name.toLowerCase().indexOf(query.toLowerCase());
+      if (i >= 0) {
+        item.innerHTML =
+          name.slice(0, i) +
+          `<strong>${name.slice(i, i + query.length)}</strong>` +
+          name.slice(i + query.length);
+      } else {
+        item.textContent = name;
+      }
+
+      item.addEventListener('mousedown', e => {
+        e.preventDefault();
+        searchInput.value        = name;
+        searchDropdown.innerHTML = '';
+        flyToCountry(c);
+      });
+
+      searchDropdown.appendChild(item);
+    });
+}
+
+
+
+
+
