@@ -24,6 +24,17 @@ body {
   z-index: 1;
 }
 
+/* Hover tooltip same thing with globe */
+#map-container .globe-label {
+  background: rgba(0, 0, 0, 0.7);
+  color: #ffffff;
+  padding: 3px 8px;
+  border-radius: 4px;
+  font-family: sans-serif;
+  font-size: 0.8rem;
+  white-space: nowrap;
+}
+
 /* Base styling for the popup panel */
 .popup {
   position: fixed;
