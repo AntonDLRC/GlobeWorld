@@ -230,3 +230,34 @@ border: 1px solid rgba(255, 255, 255, 0.25);
   width: 100%;
   height: 100%;
 }
+
+#region-filter {
+  background: rgba(255, 255, 255, 0.08);
+  color: #ffffff;
+  border: none;
+  border-radius: 6px 0 0 6px;
+  padding: 0 8px;
+  font-size: 0.8rem;
+  outline: none;
+  cursor: pointer;
+}
+
+#region-filter option {
+  background: #1a1f2e;
+  color: #ffffff;
+}
+
+.search-dropdown {
+  max-height: 280px;      /* roughly 8 rows tall — adjust to taste */
+  overflow-y: auto;
+  overflow-x: hidden;
+}
+
+/* optional: style the scrollbar to match your dark theme */
+.search-dropdown::-webkit-scrollbar {
+  width: 6px;
+}
+.search-dropdown::-webkit-scrollbar-thumb {
+  background: rgba(255, 255, 255, 0.25);
+  border-radius: 3px;
+}
