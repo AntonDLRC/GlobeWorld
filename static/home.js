@@ -228,23 +228,39 @@ const searchInput    = document.getElementById('search-input');
 const searchDropdown = document.getElementById('search-dropdown');
 let   searchTimer    = null;
 
+const regionFilter = document.getElementById('region-filter');
+let   selectedRegion = 'all';
+
+regionFilter.addEventListener('change', () => {
+  selectedRegion = regionFilter.value;
+  runSearch();
+});
+
 searchInput.addEventListener('input', () => {
   clearTimeout(searchTimer);
-  const query = searchInput.value.trim();
+  searchTimer = setTimeout(runSearch, 250);
+});
 
-  if (query.length < 2) {
+function runSearch() {
+  const query = searchInput.value.trim();
+  const q = query.toLowerCase();
+
+  let results = allCountries.filter(c => validISO2.has(c.cca2));
+
+  if (selectedRegion !== 'all') {
+    results = results.filter(c => c.region === selectedRegion);
+  }
+
+  if (query.length >= 2) {
+    results = results.filter(c => c.name.common.toLowerCase().includes(q));
+  } else if (selectedRegion === 'all') {
+    // nothing typed and no region picked -> stay empty, same as before
     searchDropdown.innerHTML = '';
     return;
   }
 
-  searchTimer = setTimeout(() => {
-    const q = query.toLowerCase();
-    const results = allCountries.filter(c =>
-      c.name.common.toLowerCase().includes(q)
-    );
-    buildDropdown(results, query);
-  }, 250);
-});
+  buildDropdown(results, query);
+}
 
 searchInput.addEventListener('keydown', e => {
   if (e.key === 'Enter') {
@@ -271,13 +287,11 @@ function buildDropdown(results, query) {
   if (!results || !results.length) return;
 
   results
-    .filter(c => validISO2.has(c.cca2))
     .sort((a, b) => {
       const aStarts = a.name.common.toLowerCase().startsWith(query.toLowerCase()) ? 0 : 1;
       const bStarts = b.name.common.toLowerCase().startsWith(query.toLowerCase()) ? 0 : 1;
       return aStarts - bStarts;
     })
-    .slice(0, 8)
     .forEach(c => {
       const item = document.createElement('li');
       const name  = c.name.common;
