@@ -54,5 +54,9 @@ def all_countries():
 def map_page():
     return render_template("map.html")
 
+@app.route("/quiz")
+def quiz_page():
+    return render_template("quiz.html")
+
 if __name__ == "__main__":
     app.run(debug=True, port=5245)
