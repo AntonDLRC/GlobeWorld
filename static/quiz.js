@@ -62,3 +62,39 @@ Promise.all([
   checkReady();
 }).catch(err => console.error('Failed to load quiz data:', err));
 
+/* ---------- setup selection ---------- */
+
+modeButtons.forEach(btn => {
+  btn.addEventListener('click', () => {
+    modeButtons.forEach(b => b.classList.remove('active'));
+    btn.classList.add('active');
+    quizMode = btn.dataset.mode;
+    checkReady();
+  });
+});
+
+diffButtons.forEach(btn => {
+  btn.addEventListener('click', () => {
+    diffButtons.forEach(b => b.classList.remove('active'));
+    btn.classList.add('active');
+    difficulty = btn.dataset.difficulty;
+    checkReady();
+  });
+});
+
+function checkReady() {
+  startBtn.disabled = !(quizMode && difficulty && allCountries.length);
+}
+
+startBtn.addEventListener('click', startQuiz);
+
+playAgainBtn.addEventListener('click', () => {
+  resultsPanel.classList.remove('visible');
+  startQuiz();
+});
+
+backSetupBtn.addEventListener('click', () => {
+  resultsPanel.classList.remove('visible');
+  setupPanel.classList.add('visible');
+});
+
