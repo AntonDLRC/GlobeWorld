@@ -45,3 +45,20 @@ const bestScoreText  = document.getElementById('best-score-text');
 const playAgainBtn   = document.getElementById('play-again-btn');
 const backSetupBtn   = document.getElementById('back-setup-btn');
 
+/* ---------- load data, this is same as the globe and map page ---------- */
+
+Promise.all([
+  fetch('/api/all-countries').then(r => r.json()),
+  fetch('/api/countries').then(r => r.json())
+]).then(([countryList, dbData]) => {
+  allCountries = countryList;
+  dbData.iso2_list.forEach(code => validISO2.add(code));
+
+  countryList.forEach(c => {
+    if (c.cca2) cca2Map.set(c.cca2, c);
+    if (c.cca3) cca3Map.set(c.cca3, c);
+  });
+
+  checkReady();
+}).catch(err => console.error('Failed to load quiz data:', err));
+
