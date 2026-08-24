@@ -98,3 +98,20 @@ backSetupBtn.addEventListener('click', () => {
   setupPanel.classList.add('visible');
 });
 
+/* ---------- pool building ---------- */
+
+function buildPool() {
+  const inTier = AREA_TIERS[difficulty];
+
+  let pool = allCountries.filter(c =>
+    validISO2.has(c.cca2) &&
+    c.area && inTier(c.area)
+  );
+
+  if (quizMode === 'border') {
+    pool = pool.filter(c => c.borders && c.borders.length > 0);
+  }
+
+  return pool;
+}
+
