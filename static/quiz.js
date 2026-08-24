@@ -171,3 +171,37 @@ function buildQuestion(answerCountry, pool) {
     };
   }
 
+   // border mode
+  const borderCca3 = answerCountry.borders[
+    Math.floor(Math.random() * answerCountry.borders.length)
+  ];
+  const correctNeighbor = cca3Map.get(borderCca3);
+
+  if (!correctNeighbor) {
+    // this country's border data didn't resolve — pick a different one instead
+    const fallback = pool[Math.floor(Math.random() * pool.length)];
+    return buildQuestion(fallback, pool);
+  }
+
+  const nonBorderingOptions = shuffle(
+    pool.filter(c =>
+      c.cca2 !== answerCountry.cca2 &&
+      c.cca2 !== correctNeighbor.cca2 &&
+      !(answerCountry.borders || []).includes(c.cca3)
+    )
+  ).slice(0, numOptions - 1);
+
+  const options = shuffle([correctNeighbor, ...nonBorderingOptions]);
+
+  return {
+    type: 'border',
+    country: answerCountry,
+    prompt: `Which of these countries shares a border with ${answerCountry.name.common}?`,
+    media: null,
+    options: options.map(c => ({
+      label: c.name.common,
+      correct: c.cca2 === correctNeighbor.cca2,
+    })),
+  };
+}
+
