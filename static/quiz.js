@@ -44,6 +44,7 @@ const finalScoreText = document.getElementById('final-score-text');
 const bestScoreText  = document.getElementById('best-score-text');
 const playAgainBtn   = document.getElementById('play-again-btn');
 const backSetupBtn   = document.getElementById('back-setup-btn');
+const quizCloseBtn = document.getElementById('quiz-close-btn');
 
 /* ---------- load data, this is same as the globe and map page ---------- */
 
@@ -98,6 +99,11 @@ backSetupBtn.addEventListener('click', () => {
   setupPanel.classList.add('visible');
 });
 
+quizCloseBtn.addEventListener('click', () => {
+  quizPanel.classList.remove('visible');
+  setupPanel.classList.add('visible');
+});
+
 /* ---------- pool building ---------- */
 
 function buildPool() {
@@ -114,4 +120,54 @@ function buildPool() {
 
   return pool;
 }
+
+/* ---------- start quiz ---------- */
+
+function startQuiz() {
+  const pool = buildPool();
+
+  if (pool.length < OPTIONS_BY_DIFFICULTY[difficulty]) {
+    alert('Not enough countries for this combination — try a different difficulty.');
+    return;
+  }
+
+  const shuffledPool = shuffle([...pool]);
+  const count = Math.min(TOTAL_QUESTIONS, shuffledPool.length);
+
+  questions = [];
+  for (let i = 0; i < count; i++) {
+    questions.push(buildQuestion(shuffledPool[i], pool));
+  }
+
+  currentIndex = 0;
+  score = 0;
+
+  setupPanel.classList.remove('visible');
+  resultsPanel.classList.remove('visible');
+  quizPanel.classList.add('visible');
+
+  renderQuestion();
+}
+
+function buildQuestion(answerCountry, pool) {
+  const numOptions = OPTIONS_BY_DIFFICULTY[difficulty];
+
+  if (quizMode === 'flag') {
+    const distractors = shuffle(
+      pool.filter(c => c.cca2 !== answerCountry.cca2)
+    ).slice(0, numOptions - 1);
+
+    const options = shuffle([answerCountry, ...distractors]);
+
+    return {
+      type: 'flag',
+      country: answerCountry,
+      prompt: 'Which country does this flag belong to?',
+      media: `https://flagcdn.com/w320/${answerCountry.cca2.toLowerCase()}.png`,
+      options: options.map(c => ({
+        label: c.name.common,
+        correct: c.cca2 === answerCountry.cca2,
+      })),
+    };
+  }
 
