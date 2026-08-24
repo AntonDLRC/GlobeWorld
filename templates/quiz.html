@@ -9,6 +9,60 @@
     <h1 class="title">Country Quiz</h1>
 </header>
 
+<div class="quiz-wrapper">
 
+    <!-- Setup panel -->
+    <div id="setup-panel" class="quiz-panel-box visible">
+        <h2 class="quiz-heading">Choose a quiz mode</h2>
+        <div class="quiz-choice-row">
+            <button class="mode-btn" data-mode="flag">🏳️ Flag Quiz</button>
+            <button class="mode-btn" data-mode="border">🗺️ Border Quiz</button>
+        </div>
+
+        <h2 class="quiz-heading">Choose a difficulty</h2>
+        <div class="quiz-choice-row">
+            <button class="diff-btn" data-difficulty="easy">Easy</button>
+            <button class="diff-btn" data-difficulty="medium">Medium</button>
+            <button class="diff-btn" data-difficulty="hard">Hard</button>
+        </div>
+
+        <button id="start-btn" class="start-btn" disabled>Start Quiz</button>
+    </div>
+
+    <!-- Quiz in progress panel -->
+    <div id="quiz-panel" class="quiz-panel-box">
+        <button id="quiz-close-btn" class="quiz-close-btn" aria-label="Back to start">&times;</button>
+        <div class="quiz-top-row">
+            <span id="question-counter"></span>
+            <span id="score-display"></span>
+        </div>
+
+        <div id="question-media" class="question-media"></div>
+        <p id="question-text" class="question-text"></p>
+
+        <div id="options-container" class="options-container"></div>
+
+        <p id="feedback-text" class="feedback-text"></p>
+
+        <button id="next-btn" class="next-btn">Next →</button>
+    </div>
+
+    <!-- Results panel -->
+    <div id="results-panel" class="quiz-panel-box">
+        <h2 class="quiz-heading">Quiz Complete!</h2>
+        <p id="final-score-text" class="final-score-text"></p>
+        <p id="best-score-text" class="best-score-text"></p>
+
+        <ul id="results-breakdown" class="results-breakdown"></ul>
+
+        <div class="quiz-choice-row">
+            <button id="play-again-btn" class="start-btn">Play Again</button>
+            <button id="back-setup-btn" class="start-btn secondary">Change Settings</button>
+        </div>
+    </div>
+
+</div>
+
+<script src="{{ url_for('static', filename='quiz.js') }}"></script>
 
 {% endblock %}
