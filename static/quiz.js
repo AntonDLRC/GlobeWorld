@@ -270,3 +270,27 @@ nextBtn.addEventListener('click', () => {
   }
 });
 
+/* ---------- end quiz ---------- */
+
+function endQuiz() {
+  quizPanel.classList.remove('visible');
+  resultsPanel.classList.add('visible');
+
+  finalScoreText.textContent = `${score} / ${questions.length}`;
+
+  const key = `quiz-best-${quizMode}-${difficulty}`;
+  const prevBest = parseInt(localStorage.getItem(key) || '0', 10);
+  const best = Math.max(prevBest, score);
+  localStorage.setItem(key, String(best));
+  bestScoreText.textContent = `Best: ${best} / ${questions.length}`;
+}
+
+/* ---------- helpers ---------- */
+
+function shuffle(arr) {
+  for (let i = arr.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i + 1));
+    [arr[i], arr[j]] = [arr[j], arr[i]];
+  }
+  return arr;
+}
