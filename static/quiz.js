@@ -205,3 +205,68 @@ function buildQuestion(answerCountry, pool) {
   };
 }
 
+/* ---------- render question ---------- */
+
+function renderQuestion() {
+  answered = false;
+  const q = questions[currentIndex];
+
+  questionCounter.textContent = `Question ${currentIndex + 1} / ${questions.length}`;
+  scoreDisplay.textContent    = `Score: ${score}`;
+  questionText.textContent    = q.prompt;
+  feedbackText.textContent    = '';
+  feedbackText.className      = 'feedback-text';
+  nextBtn.classList.remove('visible');
+
+  if (q.type === 'flag') {
+    questionMedia.innerHTML = `<img src="${q.media}" alt="Flag" class="quiz-flag-img" />`;
+  } else {
+    questionMedia.innerHTML = `<div class="quiz-border-name">${q.country.name.common}</div>`;
+  }
+
+  optionsContainer.innerHTML = '';
+  q.options.forEach(opt => {
+    const btn = document.createElement('button');
+    btn.className = 'option-btn';
+    btn.textContent = opt.label;
+    btn.addEventListener('click', () => handleAnswer(btn, opt));
+    optionsContainer.appendChild(btn);
+  });
+}
+
+function handleAnswer(btn, opt) {
+  if (answered) return;
+  answered = true;
+
+  const allBtns = optionsContainer.querySelectorAll('.option-btn');
+  allBtns.forEach(b => (b.disabled = true));
+
+  if (opt.correct) {
+    btn.classList.add('correct');
+    score++;
+    feedbackText.textContent = 'Correct!';
+    feedbackText.classList.add('correct-text');
+  } else {
+    btn.classList.add('wrong');
+    feedbackText.textContent = 'Incorrect.';
+    feedbackText.classList.add('wrong-text');
+
+    const q = questions[currentIndex];
+    Array.from(allBtns).forEach((b, i) => {
+      if (q.options[i].correct) b.classList.add('correct');
+    });
+  }
+
+  scoreDisplay.textContent = `Score: ${score}`;
+  nextBtn.classList.add('visible');
+}
+
+nextBtn.addEventListener('click', () => {
+  currentIndex++;
+  if (currentIndex >= questions.length) {
+    endQuiz();
+  } else {
+    renderQuestion();
+  }
+});
+
