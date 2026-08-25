@@ -261,3 +261,45 @@ border: 1px solid rgba(255, 255, 255, 0.25);
   background: rgba(255, 255, 255, 0.25);
   border-radius: 3px;
 }
+
+/* This is the switch buttons css, this can be seen at the top of the screen page. */
+
+.switch-btn-left {
+  left: calc(50% - 70px);
+}
+
+.switch-btn-right {
+  left: calc(50% + 70px);
+}
+
+/* QUIZ PAGE */
+
+.quiz-wrapper {
+  position: fixed;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 5;
+  padding: 2rem;
+}
+
+.quiz-panel-box {
+  display: none;
+  flex-direction: column;
+  align-items: center;
+  gap: 1rem;
+  width: 100%;
+  max-width: 520px;
+  padding: 2rem 2.25rem;
+  border-radius: 16px;
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  background: rgba(86, 111, 162, 0.88);
+  text-align: center;
+}
+
+.quiz-panel-box.visible {
+  display: flex;
+}
+
