@@ -299,6 +299,7 @@ border: 1px solid rgba(255, 255, 255, 0.25);
   text-align: center;
 }
 
+
 .quiz-panel-box.visible {
   display: flex;
 }
@@ -307,6 +308,10 @@ border: 1px solid rgba(255, 255, 255, 0.25);
    this overrides default browser black text on <h2>, <p>, <button>, <li>, etc. */
 .quiz-panel-box, .quiz-panel-box * {
   color: #ffffff;
+}
+
+.quiz-close-btn {
+  color: #000000;
 }
 
 .quiz-heading {
