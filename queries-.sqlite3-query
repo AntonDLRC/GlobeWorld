@@ -9,3 +9,10 @@ CREATE TABLE countries (
 
 UPDATE countries SET places = 'Gobi Desert, Khuvsgul Lake, Orkhon Valley, Karakorum Ancient Capital, Terelj National Park' WHERE iso2 = 'MN';
 UPDATE countries SET places = 'Bagan Temples, Inle Lake, Shwedagon Pagoda, Mandalay Palace, Ngapali Beach' WHERE iso2 = 'MM';
+
+INSERT OR IGNORE INTO countries (iso2, description) VALUES
+('VE', 'Venezuela was home to indigenous peoples including the Caribs and Arawaks before Spanish colonisers arrived in 1498. It became a springboard for Simón Bolívar''s independence movement, which liberated much of northern South America from Spanish rule in the early 19th century. The discovery of vast oil reserves in the early 20th century transformed Venezuela into one of the wealthiest nations in Latin America. Decades of political turmoil followed, including Hugo Chávez''s socialist "Bolivarian Revolution" from 1999, and under his successor Nicolás Maduro the country has suffered a catastrophic economic collapse and hyperinflation, driving one of the largest mass migrations in modern Latin American history.');
+
+UPDATE countries SET places = 'Angel Falls, Los Roques Archipelago, Canaima National Park, Merida Cable Car, Morrocoy National Park' WHERE iso2 = 'VE';
+UPDATE countries SET population = '28,435,943' WHERE iso2 = 'VE';
+UPDATE countries SET timezone = 'UTC-04:00' WHERE iso2 = 'VE';
